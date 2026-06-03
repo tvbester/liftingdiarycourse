@@ -4,6 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 @AGENTS.md
 
+## IMPORTANT: Always consult /docs first
+
+Before generating any code, **always read the relevant documentation file in the `/docs` directory** for the area you are working in. These docs define the intended design, patterns, and conventions for this project — they take precedence over general knowledge or defaults.
+
+Check `/docs` for a file matching the domain (e.g., `ui.md` for UI work, `auth.md` for authentication, etc.) and follow its guidance before writing any code.
+
 ## Commands
 
 ```bash

@@ -31,3 +31,18 @@ export async function getWorkoutsForDate(date: Date) {
 
   return rows
 }
+
+export async function createWorkout(input: { name: string; date: string; duration?: number; notes?: string }) {
+  const user = await getAuthUser()
+  const [workout] = await db
+    .insert(workouts)
+    .values({
+      userId: user.id,
+      name: input.name,
+      date: new Date(input.date),
+      duration: input.duration,
+      notes: input.notes,
+    })
+    .returning({ id: workouts.id })
+  return workout
+}

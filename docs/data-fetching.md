@@ -94,6 +94,37 @@ export async function getWorkoutById(workoutId: string) {
 }
 ```
 
+## Handling missing resources — notFound()
+
+When a `/data` helper returns `null` (record doesn't exist or belongs to another user), call `notFound()` from `next/navigation` in the Server Component. Do **not** render a fallback UI or throw a generic error.
+
+```tsx
+// ✅ Correct — app/dashboard/workout/[workoutId]/page.tsx
+import { notFound } from 'next/navigation'
+import { getWorkoutById } from '@/data/workouts'
+
+export default async function EditWorkoutPage({ params }: { params: Promise<{ workoutId: string }> }) {
+  const { workoutId } = await params
+  const workout = await getWorkoutById(workoutId)
+
+  if (!workout) notFound()  // renders the nearest not-found.tsx
+  // ...
+}
+```
+
+- `getWorkoutById` already scopes to the authenticated user, so a `null` return means either the record doesn't exist **or** it belongs to someone else — `notFound()` is the correct response for both cases.
+- Never return a 200 with "workout not found" text. Always use `notFound()`.
+
+## Dynamic route params
+
+In Next.js 16, `params` is a `Promise` — always `await` it before reading properties.
+
+```tsx
+export default async function Page({ params }: { params: Promise<{ workoutId: string }> }) {
+  const { workoutId } = await params  // ✅ must await
+}
+```
+
 ## Summary
 
 | Concern | Rule |
@@ -102,3 +133,5 @@ export async function getWorkoutById(workoutId: string) {
 | Where to write queries | `/data` helper functions only |
 | Query tool | Drizzle ORM — no raw SQL |
 | User scoping | Always resolved from session inside the helper, never passed in |
+| Missing resource | Call `notFound()` — never render fallback UI |
+| Dynamic params | Always `await params` before accessing properties |

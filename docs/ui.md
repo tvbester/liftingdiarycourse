@@ -42,6 +42,42 @@ function formatDate(date: Date): string {
 `MMM` produces the abbreviated month (`Jan`, `Feb`, …).  
 `yyyy` produces the four-digit year.
 
+## Edit Forms — Pre-populating with defaultValue
+
+When building an edit form for an existing record, pass current values as `defaultValue` props on each input. Do **not** use controlled state (`useState`) to seed the initial values — use uncontrolled inputs with `defaultValue` and read the form data via `FormData` or individual refs on submit.
+
+```tsx
+// ✅ Correct — uncontrolled inputs with defaultValue
+<Input name="name" defaultValue={defaultName} />
+<Input name="date" type="date" defaultValue={defaultDate} />
+```
+
+The Server Component fetches the record, transforms any values needed for the input (e.g. `.toISOString().slice(0, 10)` for a date input), then passes them as props to the Client Component form:
+
+```tsx
+// Server Component (page.tsx)
+const workout = await getWorkoutById(workoutId)
+if (!workout) notFound()
+
+const defaultDate = workout.date.toISOString().slice(0, 10) // "YYYY-MM-DD" for <input type="date">
+
+return <EditWorkoutForm defaultName={workout.name} defaultDate={defaultDate} ... />
+```
+
+```tsx
+// Client Component (EditWorkoutForm.tsx)
+'use client'
+export function EditWorkoutForm({ defaultName, defaultDate }: EditWorkoutFormProps) {
+  // No useState for initial values — use defaultValue on the input
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const data = new FormData(e.currentTarget)
+    const name = data.get('name') as string
+    // ...
+  }
+}
+```
+
 ### Rules
 
 - Never use `new Date().toLocaleDateString()`, `Intl.DateTimeFormat`, or hand-rolled ordinal helpers.

@@ -12,6 +12,8 @@ Check `/docs` for a file matching the domain (e.g., `ui.md` for UI work, `auth.m
 
 - /docs/ui.md
 - /docs/data-fetching.md
+- /docs/auth.md
+- /docs/data-mutations.md
 
 ## Commands
 
